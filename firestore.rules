@@ -1,0 +1,116 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    // Global default-deny safety net
+    match /{document=**} {
+      allow read, write: if false;
+    }
+
+    // Shared primitives
+    function isSignedIn() {
+      return request.auth != null;
+    }
+
+    function isOwner(userId) {
+      return isSignedIn() && request.auth.uid == userId;
+    }
+
+    function isValidId(id) {
+      return id is string && id.size() >= 1 && id.size() <= 128 && id.matches('^[a-zA-Z0-9_\\-]+$');
+    }
+
+    function incoming() {
+      return request.resource.data;
+    }
+
+    function existing() {
+      return resource.data;
+    }
+
+    function isValidWebsiteProject(data, userId) {
+      return data.userId is string &&
+             data.userId == request.auth.uid &&
+             data.userId == userId &&
+             data.userId.size() >= 1 &&
+             data.userId.size() <= 128 &&
+             data.title is string &&
+             data.title.size() >= 1 &&
+             data.title.size() <= 120 &&
+             data.heading is string &&
+             data.heading.size() >= 1 &&
+             data.heading.size() <= 180 &&
+             data.content is string &&
+             data.content.size() >= 1 &&
+             data.content.size() <= 5000 &&
+             data.themeFinish is string &&
+             data.themeFinish in ['GOLD', 'SILVER', 'PLATINUM'] &&
+             data.generatedHtml is string &&
+             data.generatedHtml.size() >= 1 &&
+             data.generatedHtml.size() <= 50000 &&
+             data.createdAt is timestamp &&
+             data.createdAt <= request.time &&
+             data.updatedAt is timestamp &&
+             data.updatedAt <= request.time;
+    }
+
+    function isValidPythonScript(data, userId) {
+      return data.userId is string &&
+             data.userId == request.auth.uid &&
+             data.userId == userId &&
+             data.userId.size() >= 1 &&
+             data.userId.size() <= 128 &&
+             data.name is string &&
+             data.name.size() >= 1 &&
+             data.name.size() <= 120 &&
+             data.code is string &&
+             data.code.size() >= 1 &&
+             data.code.size() <= 25000 &&
+             data.lastOutput is string &&
+             data.lastOutput.size() <= 25000 &&
+             data.createdAt is timestamp &&
+             data.createdAt <= request.time &&
+             data.updatedAt is timestamp &&
+             data.updatedAt <= request.time;
+    }
+
+    match /users/{userId}/websites/{websiteId} {
+      allow get: if isOwner(userId) && isValidId(websiteId);
+      allow list: if isOwner(userId);
+
+      allow create: if isOwner(userId) &&
+                       isValidId(websiteId) &&
+                       incoming().keys().hasAll(['userId', 'title', 'heading', 'content', 'themeFinish', 'generatedHtml', 'createdAt', 'updatedAt']) &&
+                       incoming().keys().hasOnly(['userId', 'title', 'heading', 'content', 'themeFinish', 'generatedHtml', 'createdAt', 'updatedAt']) &&
+                       isValidWebsiteProject(incoming(), userId);
+
+      allow update: if isOwner(userId) &&
+                       isValidId(websiteId) &&
+                       isValidWebsiteProject(incoming(), userId) &&
+                       incoming().userId == existing().userId &&
+                       incoming().createdAt == existing().createdAt &&
+                       incoming().diff(existing()).affectedKeys().hasOnly(['title', 'heading', 'content', 'themeFinish', 'generatedHtml', 'updatedAt']);
+
+      allow delete: if isOwner(userId) && isValidId(websiteId);
+    }
+
+    match /users/{userId}/scripts/{scriptId} {
+      allow get: if isOwner(userId) && isValidId(scriptId);
+      allow list: if isOwner(userId);
+
+      allow create: if isOwner(userId) &&
+                       isValidId(scriptId) &&
+                       incoming().keys().hasAll(['userId', 'name', 'code', 'lastOutput', 'createdAt', 'updatedAt']) &&
+                       incoming().keys().hasOnly(['userId', 'name', 'code', 'lastOutput', 'createdAt', 'updatedAt']) &&
+                       isValidPythonScript(incoming(), userId);
+
+      allow update: if isOwner(userId) &&
+                       isValidId(scriptId) &&
+                       isValidPythonScript(incoming(), userId) &&
+                       incoming().userId == existing().userId &&
+                       incoming().createdAt == existing().createdAt &&
+                       incoming().diff(existing()).affectedKeys().hasOnly(['name', 'code', 'lastOutput', 'updatedAt']);
+
+      allow delete: if isOwner(userId) && isValidId(scriptId);
+    }
+  }
+}

@@ -1,0 +1,111 @@
+{
+  "entities": {
+    "WebsiteProject": {
+      "title": "WebsiteProject",
+      "description": "A user-authored or AI-generated website project with Gold, Silver, or Platinum finish.",
+      "type": "object",
+      "properties": {
+        "userId": {
+          "type": "string",
+          "description": "Owner Firebase Auth UID"
+        },
+        "title": {
+          "type": "string",
+          "description": "Website title"
+        },
+        "heading": {
+          "type": "string",
+          "description": "Main hero heading"
+        },
+        "content": {
+          "type": "string",
+          "description": "Website body copy"
+        },
+        "themeFinish": {
+          "type": "string",
+          "enum": ["GOLD", "SILVER", "PLATINUM"],
+          "description": "Selected metallic theme finish"
+        },
+        "generatedHtml": {
+          "type": "string",
+          "description": "Rendered HTML document string"
+        },
+        "createdAt": {
+          "type": "string",
+          "format": "date-time",
+          "description": "Server timestamp of creation (FieldValue.serverTimestamp())"
+        },
+        "updatedAt": {
+          "type": "string",
+          "format": "date-time",
+          "description": "Server timestamp of last update (FieldValue.serverTimestamp())"
+        }
+      },
+      "required": [
+        "userId",
+        "title",
+        "heading",
+        "content",
+        "themeFinish",
+        "generatedHtml",
+        "createdAt",
+        "updatedAt"
+      ]
+    },
+    "PythonScript": {
+      "title": "PythonScript",
+      "description": "A saved Python script and its latest simulated terminal output.",
+      "type": "object",
+      "properties": {
+        "userId": {
+          "type": "string",
+          "description": "Owner Firebase Auth UID"
+        },
+        "name": {
+          "type": "string",
+          "description": "Script filename or title"
+        },
+        "code": {
+          "type": "string",
+          "description": "Python source code"
+        },
+        "lastOutput": {
+          "type": "string",
+          "description": "Latest terminal output"
+        },
+        "createdAt": {
+          "type": "string",
+          "format": "date-time",
+          "description": "Server timestamp of creation (FieldValue.serverTimestamp())"
+        },
+        "updatedAt": {
+          "type": "string",
+          "format": "date-time",
+          "description": "Server timestamp of last update (FieldValue.serverTimestamp())"
+        }
+      },
+      "required": [
+        "userId",
+        "name",
+        "code",
+        "lastOutput",
+        "createdAt",
+        "updatedAt"
+      ]
+    }
+  },
+  "firestore": {
+    "/users/{userId}/websites/{websiteId}": {
+      "schema": {
+        "$ref": "#/entities/WebsiteProject"
+      },
+      "description": "User-owned saved website projects"
+    },
+    "/users/{userId}/scripts/{scriptId}": {
+      "schema": {
+        "$ref": "#/entities/PythonScript"
+      },
+      "description": "User-owned saved Python scripts"
+    }
+  }
+}

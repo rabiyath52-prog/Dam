@@ -1,0 +1,18 @@
+<resources>
+    <string name="app_name">Ekativa Studio</string>
+    <string name="tagline">Website Maker &amp; Python Studio</string>
+    <string name="sign_in_with_google">Sign in with Google</string>
+    <string name="sign_out">Sign out</string>
+    <string name="tab_website_maker">Website Maker</string>
+    <string name="tab_python_coder">Python Coder</string>
+    <string name="generate_from_photo">Generate from Photo</string>
+    <string name="analyzing_photo">Analyzing photo with Gemini…</string>
+    <string name="website_title_label">Website Title</string>
+    <string name="website_heading_label">Main Heading</string>
+    <string name="website_content_label">Website Content</string>
+    <string name="save_website">Save Website</string>
+    <string name="update_website">Update Website</string>
+    <string name="run_python">Run Code</string>
+    <string name="review_python">AI Review</string>
+    <string name="save_script">Save Script</string>
+</resources>
